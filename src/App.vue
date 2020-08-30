@@ -1,88 +1,59 @@
 <template>
   <div id="app">
+    <v-app>
+      <restaurant-navigation :drawer="drawer" @setDrawer="drawer=$event"></restaurant-navigation>
 
-    <v-navigation-drawer
-        v-model="drawer"
-        :clipped="$vuetify.breakpoint.lgAndUp"
-        app
-    >
-      <v-list dense>
-        <template v-for="item in search_result.restaurants">
-          <v-list-item link :key="item.restaurant.id">
-            <v-list-item-action>
-              <v-icon>mdi-contacts</v-icon>
-            </v-list-item-action>
-            <v-list-item-content>
-              <v-list-item-title>
-                {{ item.restaurant.name }}
-              </v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-        </template>
-      </v-list>
-    </v-navigation-drawer>
-
-    <v-app-bar
-        :clipped-left="$vuetify.breakpoint.lgAndUp"
-        app
-        color="blue darken-3"
-        :height="200"
-        class="elevation-0"
-    >
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-
-      <v-container fluid>
-        <v-row no-gutters>
-          <v-col cols="12" md="6" lg="4">A</v-col>
-          <v-col cols="12" md="6" lg="4">B</v-col>
-          <v-col cols="12" md="12" lg="4">C</v-col>
-        </v-row>
-      </v-container>
-
-    </v-app-bar>
-    <v-main>
-      <v-container
-          class="fill-height"
-          fluid
+      <v-app-bar
+          :clipped-left="$vuetify.breakpoint.lgAndUp"
+          app
+          color="white"
+          :height="$vuetify.breakpoint.mdAndDown ? 0 : 200"
+          class="elevation-0"
       >
-        <v-row
-            align="center"
-            justify="center"
-        >
-          {{ search_result }}
-        </v-row>
-      </v-container>
-    </v-main>
+        <v-app-bar-nav-icon v-if="$vuetify.breakpoint.mdAndDown" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
 
+        <filters v-if="$vuetify.breakpoint.mdAndUp"></filters>
+      </v-app-bar>
 
+      <v-main>
+        <filters v-if="$vuetify.breakpoint.mdAndDown"></filters>
+
+        <v-container fluid>
+          <v-row align="center" justify="center">
+            {{ search_result.restaurants }}
+          </v-row>
+        </v-container>
+      </v-main>
+
+    </v-app>
   </div>
 </template>
 
 <script>
-// import axios from 'axios';
 import { mapGetters } from 'vuex';
+import restaurantNavigation from './components/RestaurantNavigation'
+import filters from './components/Filters'
 
 export default {
   name: 'App',
 
   data: () => ({
     drawer: null,
-    selected_restaurant: null
   }),
+
+  components:{
+    restaurantNavigation,
+    filters
+  },
 
   computed: {
     ...mapGetters({
-      search_result: 'getSearchResult',
+      search_result : 'getSearchResult',
     }),
   },
 
   mounted () {
-    let params= {
-      start     : 0,
-      count     : 20,
-      cuisines  : 1035
-    }
-    this.$store.dispatch('fetchRestaurants', params)
+
   }
 }
 </script>
