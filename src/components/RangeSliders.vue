@@ -3,7 +3,7 @@
     <p class="subtitle-2 ml-1 mb-2">RATING</p>
     <v-row no-gutters>
       <v-range-slider
-          tick-labels="012345"
+          :tick-labels="['0','1','2','3','4','5']"
           :value="[1, 4]"
           min="0"
           max="5"
@@ -30,32 +30,18 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
-
 export default {
-  name: 'Categories',
+  name: 'RangeSliders',
 
   data: () => ({
 
   }),
 
   computed: {
-    ...mapGetters({
-      categories: 'getCategories',
-    }),
 
-    selected_categories: {
-      get () {
-        return this.$store.state.selected_categories
-      },
-      set (val) {
-        this.$store.commit('setSelectedCategories', val)
-      }
-    }
   },
 
   mounted () {
-    //this.$store.dispatch('fetchCategories', {city_id: 297})
   }
 }
 </script>

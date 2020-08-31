@@ -6,19 +6,15 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    search_result       : { restaurants:[] },
     categories          : [],
     selected_categories : [],
     cuisines            : [],
     selected_cuisines   : [],
-
-    nav_overlay             : false
+    selected_restaurant : null,
+    search_start        : 0
   },
 
   getters: {
-    getSearchResult: state => {
-      return state.search_result;
-    },
     getCategories: state => {
       return state.categories;
     },
@@ -31,24 +27,50 @@ export default new Vuex.Store({
     getSelectedCuisines: state => {
       return state.selected_cuisines.join();
     },
-    getNavOverlay: state => {
-      return state.nav_overlay;
+    getSelectedRestaurant: state => {
+      return state.selected_restaurant;
     },
   },
 
   actions: {
     fetchRestaurants( {commit},params ) {
-      commit('setNavOverlay', true);
+      return new Promise((resolve, reject) => {
+        axios.get('/search', params)
+            .then(response => {
 
-      axios.get('/search', params)
-          .then(response => {
-            commit('setRestaurants', response.data)
-            commit('setNavOverlay', false)
-          })
-          .catch( error =>{
-            console.log(error);
-            commit('setNavOverlay', false)
-          })
+              resolve(response);
+              commit('setSearchStart', params.params.start)
+
+              if(response.data.restaurants.length > 0){
+                commit('setSelectedRestaurants', response.data.restaurants[0])
+              }
+              else{
+                commit('setSelectedRestaurants', null)
+              }
+
+            })
+            .catch( error =>{
+              reject(error);
+              console.log(error);
+            })
+      });
+    },
+
+    fetchMoreRestaurants( {commit}, params ) {
+
+      return new Promise((resolve, reject) => {
+        axios.get('/search', params)
+            .then(response => {
+
+              resolve(response);
+              commit('setSearchStart', params.params.start)
+
+            })
+            .catch( error =>{
+              reject(error);
+              console.log(error);
+            })
+      });
     },
 
     fetchCategories({commit}) {
@@ -105,9 +127,6 @@ export default new Vuex.Store({
   },
 
   mutations: {
-    setRestaurants (state, response) {
-      state.search_result = response
-    },
 
     setCategories(state, response) {
       state.categories = response
@@ -125,8 +144,12 @@ export default new Vuex.Store({
       state.selected_cuisines = val
     },
 
-    setNavOverlay(state, val) {
-      state.nav_overlay = val
+    setSelectedRestaurants(state, val) {
+      state.selected_restaurant = val
+    },
+
+    setSearchStart(state, val) {
+      state.search_start = val
     },
 
   },

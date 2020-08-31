@@ -2,9 +2,9 @@
   <v-container>
     <p class="subtitle-2 ml-1 mb-2">CUISINE</p>
 
-    <template v-if="categories.length > 1">
+    <template v-if="cuisines.length > 1">
       <v-row no-gutters style="height: 150px; overflow: auto;">
-        <template v-for="(item,i) in categories">
+        <template v-for="(item,i) in cuisines">
           <v-col md="3" :key="i"><v-checkbox v-model="selected_cuisines" :value="item.cuisine.cuisine_id" :label="item.cuisine.cuisine_name" hide-details dense color="accent"></v-checkbox></v-col>
         </template>
       </v-row>
@@ -25,10 +25,9 @@ export default {
 
   computed: {
     ...mapGetters({
-      categories: 'getCuisines',
+      cuisines: 'getCuisines',
     }),
 
-    //
     selected_cuisines: {
       get () {
         return this.$store.state.selected_cuisines

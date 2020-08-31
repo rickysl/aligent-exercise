@@ -17,7 +17,7 @@
           </v-list-item>
         </v-list>
         <v-progress-linear
-            :active="overlay"
+            :active="loading"
             indeterminate
             absolute
             color="accent"
@@ -25,10 +25,11 @@
       </template>
 
       <v-list dense class="pt-0">
-        <v-list-item-group active-class="active_restaurant">
+
+        <v-list-item-group :value="res_index">
           <template v-for="(item,i) in search_result.restaurants">
             <v-divider :key="`divider-${i}`"></v-divider>
-            <v-list-item link :key="`item-${i}`">
+            <v-list-item link :key="`item-${i}`" @click="selected_restaurant=item; res_index=i">
               <v-list-item-content>
                 <v-list-item-title class="font-weight-light body-2">
                   {{ item.restaurant.name }}
@@ -37,7 +38,31 @@
             </v-list-item>
           </template>
         </v-list-item-group>
+
+        <template v-if="search_result.restaurants.length <= 0">
+          <v-list-item>
+            <v-list-item-content>
+              <v-list-item-title class="font-weight-light body-2">
+                No Results
+              </v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </template>
+
       </v-list>
+
+      <template v-slot:append>
+        <v-list dense>
+          <v-list-item @click="loadMore()">
+            <v-list-item-content>
+              <v-list-item-title class="font-weight-bold overline">
+                Load More
+              </v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list>
+      </template>
+
     </v-navigation-drawer>
   </v-container>
 </template>
@@ -51,21 +76,41 @@ export default {
   props:['drawer'],
 
   data: () => ({
-    selected_restaurant: null
+    search_result : { restaurants:[] },
+    res_index     : 0,
+    loading       : false,
+    city_id       : 297
   }),
 
   computed: {
     ...mapGetters({
-      search_result : 'getSearchResult',
       categories    : 'getSelectedCategories',
       cuisines      : 'getSelectedCuisines',
-      overlay       : 'getNavOverlay',
     }),
 
     drawer_status: {
       get () { return this.drawer },
       set (val) { this.$emit('setDrawer', val)}
-    }
+    },
+
+    selected_restaurant: {
+      get () {
+        return this.$store.state.selected_restaurant
+      },
+      set (val) {
+        this.$store.commit('setSelectedRestaurants', val)
+      }
+    },
+
+    start: {
+      get () {
+        return this.$store.state.search_start
+      },
+      set (val) {
+        this.$store.commit('setSearchStart', val)
+      }
+    },
+
   },
 
   mounted () {
@@ -83,20 +128,64 @@ export default {
   },
 
   methods:{
+
     search(){
-      let params= { params:{
-          start     : 0,
-          count     : 20,
-          cuisines  : this.cuisines,
-          category  : this.categories,
-        }
+      this.loading = true;
+
+      let params= {
+        start     : 0,
+        category  : this.categories,
+        cuisines  : this.cuisines,
+        city_id   : this.city_id,
+        //1039,
+        /*cuisines=1039,161&category=6
+        lat:34.925131,
+        lon:138.6009259
+        entity_id: 98575,*/
       }
-      this.$store.dispatch('fetchRestaurants', params)
+
+      this.$router.push({ path:'/',query: params });
+      this.$store.dispatch('fetchRestaurants', { params:params})
+          .then(response => {
+
+            this.search_result = response.data;
+
+            if(response.data.restaurants.length > 0){
+              this.res_index = 0;
+              return;
+            }
+
+            this.res_index = -1;
+
+          }).finally(()=>{
+            this.loading = false;
+      })
+    },
+
+    loadMore(){
+      this.loading = true;
+
+      let params= {
+        start     : this.start + 20,
+        category  : this.categories,
+        cuisines  : this.cuisines,
+        city_id   : this.city_id,
+      }
+
+      this.$store.dispatch('fetchMoreRestaurants', { params:params})
+          .then(response => {
+
+            this.search_result.restaurants = this.search_result.restaurants.concat(response.data.restaurants);
+
+          }).finally(()=>{
+        this.loading = false;
+      })
     }
+
   }
 }
 </script>
 
 <style>
-.active_restaurant{ background:#50bebf; color:#ffffff!important; }
+.v-list-item--active{ background:#50bebf; color:#ffffff!important; }
 </style>
