@@ -1,8 +1,10 @@
 <template>
   <div id="app">
     <v-app>
+      <!-- NAVIGATION DRAWER -->
       <restaurant-navigation :drawer="drawer" @setDrawer="drawer=$event"></restaurant-navigation>
 
+      <!-- TITLE BAR -->
       <v-app-bar
           :clipped-left="$vuetify.breakpoint.lgAndUp"
           app
@@ -12,74 +14,27 @@
       >
         <v-app-bar-nav-icon v-if="$vuetify.breakpoint.mdAndDown" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
 
+        <!-- FILTERS -->
         <filters v-if="!$vuetify.breakpoint.mdAndDown"></filters>
       </v-app-bar>
 
+      <!-- BODY -->
       <v-main>
         <v-container v-if="$vuetify.breakpoint.mdAndDown">
           <v-expansion-panels>
             <v-expansion-panel>
               <v-expansion-panel-header>Filters</v-expansion-panel-header>
               <v-expansion-panel-content>
+                <!-- FILTERS -->
                 <filters></filters>
               </v-expansion-panel-content>
             </v-expansion-panel>
           </v-expansion-panels>
         </v-container>
 
+        <!-- RESTAURANT DETAILS -->
         <v-container fluid>
-          <v-row justify="center" v-if="selected_restaurant !== null">
-            <v-col cols="12" md="5">
-              <v-img
-                :src="selected_restaurant.restaurant.featured_image ? selected_restaurant.restaurant.featured_image : 'https://via.placeholder.com/500x500?text=No+Image'"
-                :lazy-src="selected_restaurant.restaurant.thumb"
-                aspect-ratio="1"
-                class="grey"
-            >
-                <template v-slot:placeholder>
-                  <v-row
-                      class="fill-height ma-0"
-                      align="center"
-                      justify="center"
-                  >
-                    <v-progress-circular indeterminate color="accent"></v-progress-circular>
-                  </v-row>
-                </template>
-              </v-img>
-            </v-col>
-            <v-col cols="12" md="7">
-              <h1>{{ selected_restaurant.restaurant.name }}</h1>
-              <h4 class="subtitle-1 grey--text">{{ selected_restaurant.restaurant.location.address }}</h4>
-
-              <v-container class="pl-0 pb-0">
-                <template v-if="selected_restaurant.restaurant.has_table_booking">
-                  <v-icon color="green" class="mr-2">mdi-check</v-icon>Bookings
-                </template>
-                <template v-else>
-                  <v-icon color="red" class="mr-2">mdi-close</v-icon>No Bookings
-                </template>
-              </v-container>
-
-              <v-container class="pl-0 pt-0">
-                <template v-if="selected_restaurant.restaurant.has_online_delivery">
-                  <v-icon color="green" class="mr-2">mdi-check</v-icon>Delivery available
-                </template>
-                <template v-else>
-                  <v-icon color="red" class="mr-2">mdi-close</v-icon>Delivery not available
-                </template>
-              </v-container>
-
-              <p class="subtitle-2 mb-0 font-weight-bold">CUISINES</p>
-              <p class="text-h5 font-weight-light">{{selected_restaurant.restaurant.cuisines}}</p>
-
-              <p class="subtitle-2  mb-0 font-weight-bold">PHONE NUMBER</p>
-              <p class="text-h5 font-weight-light">{{selected_restaurant.restaurant.phone_numbers}}</p>
-
-              <p class="subtitle-2  mb-0 font-weight-bold">OPENING HOURS</p>
-              <p class="text-h5 font-weight-light">{{selected_restaurant.restaurant.timings}}</p>
-            </v-col>
-
-          </v-row>
+          <restaurant-details></restaurant-details>
         </v-container>
       </v-main>
 
@@ -88,9 +43,9 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
 import restaurantNavigation from './components/RestaurantNavigation'
 import filters from './components/Filters'
+import restaurantDetails from './components/RestaurantDetails'
 
 export default {
   name: 'App',
@@ -101,20 +56,17 @@ export default {
 
   components:{
     restaurantNavigation,
-    filters
-  },
-
-  computed: {
-    ...mapGetters({
-      selected_restaurant : 'getSelectedRestaurant',
-    }),
+    filters,
+    restaurantDetails
   },
 
   beforeMount () {
+    // SET STATE FROM ROUTER PARAMS
     if(this.$route.query.category){
       this.$store.commit('setSelectedCategories', this.$route.query.category.replace(/, +/g, ",").split(",").map(Number))
     }
 
+    // SET STATE FROM ROUTER PARAMS
     if(this.$route.query.cuisines){
       this.$store.commit('setSelectedCuisines', this.$route.query.cuisines.replace(/, +/g, ",").split(",").map(Number))
     }

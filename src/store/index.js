@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios';
-// import router from "@/router";
 
 Vue.use(Vuex)
 
@@ -23,18 +22,21 @@ export default new Vuex.Store({
     getSelectedCategories: state => {
       return state.selected_categories.join();
     },
+
     getCuisines: state => {
       return state.cuisines;
     },
     getSelectedCuisines: state => {
       return state.selected_cuisines.join();
     },
+
     getSelectedRestaurant: state => {
       return state.selected_restaurant;
     },
   },
 
   actions: {
+      // FETCH RESTAURANTS
     fetchRestaurants( {commit},params ) {
       return new Promise((resolve, reject) => {
         axios.get('/search', params)
@@ -58,8 +60,8 @@ export default new Vuex.Store({
       });
     },
 
+      // LOAD NEXT 20 RESULTS
     fetchMoreRestaurants( {commit}, params ) {
-
       return new Promise((resolve, reject) => {
         axios.get('/search', params)
             .then(response => {
@@ -75,6 +77,7 @@ export default new Vuex.Store({
       });
     },
 
+      // FETCH CATEGORIES
     fetchCategories({commit}) {
       // if there is categories in the local storage use this
       if(localStorage.getItem('categories')) {
@@ -101,6 +104,8 @@ export default new Vuex.Store({
           })
     },
 
+
+      // FETCH CUISINES
     fetchCuisines( {commit}, params ) {
       // if there is categories in the local storage use this
       if(localStorage.getItem('cuisines')) {
@@ -155,8 +160,5 @@ export default new Vuex.Store({
     },
 
   },
-
-/*  modules: {
-  }*/
 
 })

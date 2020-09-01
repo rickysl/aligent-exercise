@@ -130,8 +130,10 @@ export default {
     },
   },
 
+
   methods:{
 
+    // FETCH RESTAURANTS
     search: debounce(function(){
 
       this.loading = true;
@@ -160,6 +162,8 @@ export default {
       })
     }, 500),
 
+
+    // LOAD NEXT 20 RESULTS
     loadMore(){
       this.loading = true;
 

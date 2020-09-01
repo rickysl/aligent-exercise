@@ -32,19 +32,5 @@
 <script>
 export default {
   name: 'RangeSliders',
-
-  data: () => ({
-
-  }),
-
-  computed: {
-
-  },
-
-  mounted () {
-  }
 }
 </script>
-
-<style>
-</style>

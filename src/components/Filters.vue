@@ -27,17 +27,6 @@ export default {
     cuisine,
     rangeSliders
   },
-
-  data: () => ({
-
-  }),
-
-  computed: {
-  },
-
-  mounted () {
-
-  }
 }
 </script>
 

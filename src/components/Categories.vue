@@ -19,10 +19,6 @@ import { mapGetters } from 'vuex';
 export default {
   name: 'Categories',
 
-  data: () => ({
-
-  }),
-
   computed: {
     ...mapGetters({
       categories: 'getCategories',
@@ -45,6 +41,5 @@ export default {
 </script>
 
 <style>
-.v-input--checkbox .v-label{font-size: .75rem!important;    font-weight: 500;
-  }
+.v-input--checkbox .v-label{font-size:.75rem!important; font-weight:500;}
 </style>
