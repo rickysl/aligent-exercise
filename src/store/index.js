@@ -1,17 +1,19 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios';
+// import router from "@/router";
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+    search_start        : 0,
     categories          : [],
-    selected_categories : [],
     cuisines            : [],
+
+    selected_categories : [],
     selected_cuisines   : [],
     selected_restaurant : null,
-    search_start        : 0
   },
 
   getters: {

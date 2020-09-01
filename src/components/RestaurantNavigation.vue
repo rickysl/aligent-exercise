@@ -11,7 +11,7 @@
           <v-list-item>
             <v-list-item-content>
               <v-list-item-title class="font-weight-bold overline">
-                RESULTS
+                RESULTS {{categories}}
               </v-list-item-title>
             </v-list-item-content>
           </v-list-item>
@@ -69,6 +69,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import debounce from 'debounce';
 
 export default {
   name: 'RestaurantNavigation',
@@ -114,22 +115,25 @@ export default {
   },
 
   mounted () {
-    this.search();
+    this.search(true);
   },
 
   watch:{
-    categories(){
+    categories(val){
+      this.$router.push({ path:'/',query: {category:val, cuisines:this.cuisines} });
       this.search();
     },
 
-    cuisines(){
+    cuisines(val){
+      this.$router.push({ path:'/',query: {category:this.categories, cuisines:val} });
       this.search();
     },
   },
 
   methods:{
 
-    search(){
+    search: debounce(function(){
+
       this.loading = true;
 
       let params= {
@@ -137,14 +141,8 @@ export default {
         category  : this.categories,
         cuisines  : this.cuisines,
         city_id   : this.city_id,
-        //1039,
-        /*cuisines=1039,161&category=6
-        lat:34.925131,
-        lon:138.6009259
-        entity_id: 98575,*/
       }
 
-      this.$router.push({ path:'/',query: params });
       this.$store.dispatch('fetchRestaurants', { params:params})
           .then(response => {
 
@@ -160,7 +158,7 @@ export default {
           }).finally(()=>{
             this.loading = false;
       })
-    },
+    }, 500),
 
     loadMore(){
       this.loading = true;

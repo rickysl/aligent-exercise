@@ -77,9 +77,7 @@
 
               <p class="subtitle-2  mb-0 font-weight-bold">OPENING HOURS</p>
               <p class="text-h5 font-weight-light">{{selected_restaurant.restaurant.timings}}</p>
-
             </v-col>
-
 
           </v-row>
         </v-container>
@@ -108,37 +106,23 @@ export default {
 
   computed: {
     ...mapGetters({
-      search_result       : 'getSearchResult',
       selected_restaurant : 'getSelectedRestaurant',
     }),
   },
 
-  mounted () {
+  beforeMount () {
+    if(this.$route.query.category){
+      this.$store.commit('setSelectedCategories', this.$route.query.category.replace(/, +/g, ",").split(",").map(Number))
+    }
+
+    if(this.$route.query.cuisines){
+      this.$store.commit('setSelectedCuisines', this.$route.query.cuisines.replace(/, +/g, ",").split(",").map(Number))
+    }
 
   }
 }
 </script>
 
 <style lang="scss">
-/*#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-
-#nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
-}*/
 .v-main { background: #f1f1f1; }
 </style>
